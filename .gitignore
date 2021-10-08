@@ -40,6 +40,7 @@
 **/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
+**/android/**/google-services.json
 .gradle/*
 
 # iOS/XCode related
