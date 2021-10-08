@@ -19,13 +19,13 @@ class Bubble extends StatelessWidget {
   final String date, time;
   final isMe, selected, newDay;
 
-//  Color myColor = Color(0xFF476dd6);
-  Color myColor = Color(0xFF216695);
-
   @override
   Widget build(BuildContext context) {
+    final Color myColor = Theme.of(context).colorScheme.secondaryVariant;
+    final Color otherColor = Theme.of(context).colorScheme.surface;
+
     final String messageText = message.text;
-    Color bg = selected ? Colors.blueGrey : isMe ? myColor : Colors.white;
+    Color bg = selected ? Colors.blueGrey : isMe ? myColor : otherColor;
     final textColor = isMe ? Colors.white : Colors.black;
     final timeColor = isMe ? Colors.white70 : Colors.black38;
     final align = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;

@@ -1,16 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:together/Core/Logger.dart';
-import 'package:together/Core/UIFunctions.dart';
-import 'package:together/Model/Album.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:image_downloader/image_downloader.dart';
-import 'package:together/Core/FileIO.dart';
 import 'package:photo_view/photo_view.dart';
 
-import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' show get;
+import 'package:together/Core/UIFunctions.dart';
+import 'package:together/Core/FileIO.dart';
 
 class ImageViewer extends StatefulWidget {
   ImageViewer(
@@ -29,7 +23,6 @@ class ImageViewer extends StatefulWidget {
 }
 
 class _ImageViewerState extends State<ImageViewer> {
-  final double _padding = 15.0;
   final fio = FileIO();
   bool _isDownloading = false;
 

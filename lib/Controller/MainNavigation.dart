@@ -37,7 +37,6 @@ class _MainNavigationState extends State<MainNavigation> {
 
   List<BarItem> _barItems = [];
 
-  //! TODO: init background and getSender separately from ChatViewModel
   final _chatViewModel = ChatViewModel();
 
   Widget chatWidget;
@@ -75,19 +74,13 @@ class _MainNavigationState extends State<MainNavigation> {
         items: _createTabs(),
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        type: BottomNavigationBarType.shifting,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.blueGrey,
       ),
     );
   }
 
   void _onItemTapped(int index) async {
     if (index == _chatIndex) {
-      //! using Future to build page before pushing
-      //! (hope it works...)
+      await _chatViewModel.setBackground();    
       Widget page = await Future.microtask(() {
         return Chat(viewModel: _chatViewModel);
       });
@@ -104,11 +97,7 @@ class _MainNavigationState extends State<MainNavigation> {
     return _barItems.map<BottomNavigationBarItem>((page) {
       return BottomNavigationBarItem(
           icon: page.icon,
-          label: page.name
-          // title: Text(
-          //   page.name,
-          //   style: TextStyle(fontSize: 14),
-          // )
+          label: page.name,
       );
     }).toList();
   }

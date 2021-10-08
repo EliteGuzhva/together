@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:rxdart/rxdart.dart';
+
 import 'package:together/Core/Connectivity.dart';
 import 'package:together/Core/FileIO.dart';
 import 'package:together/Core/Logger.dart';
@@ -12,6 +14,7 @@ import 'package:together/Core/SnapshotLoader.dart';
 import 'package:together/Model/Message.dart';
 import 'package:together/Server/Server.dart';
 import 'package:together/View/Bubble.dart';
+
 
 class ChatViewModel extends SnapshotLoader {
   final fio = FileIO();
@@ -118,11 +121,11 @@ class ChatViewModel extends SnapshotLoader {
   }
 
   Future _init() async {
-    await _setBackground();
+    await setBackground();
     await _getSender();
   }
 
-  Future _setBackground() async {
+  Future setBackground() async {
     String bg = await fio.readAsString(fio.BACKGROUND);
     if (bg != null && bg != "") {
       background = bg;
