@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "135518861393",
+    "firebase_url": "https://together-21c9d.firebaseio.com",
+    "project_id": "together-21c9d",
+    "storage_bucket": "together-21c9d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:135518861393:android:125c7e09fdb47495",
+        "android_client_info": {
+          "package_name": "com.eliteguzhva.together"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "135518861393-dagkonivq4g43a8orc7qcubcfqq0bb1c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDQX6J0g-Me3Re4qRkEh5IcYpzurqot3M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "135518861393-dagkonivq4g43a8orc7qcubcfqq0bb1c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

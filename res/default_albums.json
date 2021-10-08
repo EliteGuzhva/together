@@ -1,0 +1,34 @@
+{
+  "albums": [
+    {
+      "name": "Backgrounds",
+      "images": [
+        "res/bg1.jpg",
+        "res/bg2.jpg",
+        "res/bg3.jpg",
+        "res/bg4.jpg",
+        "res/bg5.jpg",
+        "res/bg6.jpg",
+        "res/bg7.jpg",
+        "res/bg8.jpg",
+        "res/bg9.jpg",
+        "res/bg10.jpg",
+        "res/bg11.jpg",
+        "res/bg12.jpg",
+        "res/bg13.jpg",
+        "res/bg14.jpg",
+        "res/bg15.jpg",
+        "res/bg16.jpg",
+        "res/bg17.jpg",
+        "res/bg18.jpg",
+        "res/bg19.jpg",
+        "res/bg20.jpg",
+        "res/bg21.jpg",
+        "res/bg22.jpg",
+        "res/bg23.jpg",
+        "res/bg24.jpg",
+        "res/bg25.jpg"
+      ]
+    }
+  ]
+}
