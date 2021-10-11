@@ -13,8 +13,6 @@ class AlbumViewer extends StatefulWidget {
 }
 
 class _AlbumViewerState extends State<AlbumViewer> {
-  final double _padding = 15.0;
-
   @override
   void initState() {
     super.initState();

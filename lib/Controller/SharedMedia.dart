@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
 import 'package:together/Controller/AlbumViewer.dart';
 import 'package:together/Core/UIFunctions.dart';
 import 'package:together/Core/FileIO.dart';
 import 'package:together/Model/Album.dart';
+import 'package:together/View/AppThemeData.dart';
 
 class SharedMedia extends StatefulWidget {
   SharedMedia({Key key}) : super(key: key);
@@ -91,6 +95,8 @@ class _SharedMediaState extends State<SharedMedia> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<AppThemeData>();
+
     return Scaffold(
         appBar: AppBar(
           title: Text("Shared media"),
@@ -134,7 +140,8 @@ class _SharedMediaState extends State<SharedMedia> {
                         _albums[pos].name,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                            color: theme.colorPalette.whiteBright,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   );

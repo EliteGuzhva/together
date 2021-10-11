@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+
 import 'package:together/Core/Logger.dart';
 import 'package:together/Server/Server.dart';
 import 'package:together/Core/UIFunctions.dart';
 import 'package:together/Controller/Login.dart';
 import 'package:together/Core/FileIO.dart';
+import 'package:together/View/Themes.dart';
 
 class Settings extends StatefulWidget {
   Settings({Key key}) : super(key: key);
@@ -32,6 +34,12 @@ class _SettingsState extends State<Settings> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              ElevatedButton(
+                child: Text("Сменить тему"),
+                onPressed: () {
+                  ThemeManager.instance.theme = ThemeManager.instance.nextTheme();
+                }
+              ),
               ElevatedButton(
                 child: Text("Выйти"),
                 onPressed: () {

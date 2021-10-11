@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
 import 'package:together/Model/Note.dart';
 import 'package:together/Core/UIFunctions.dart';
 import 'package:together/Controller/EditNote.dart';
+import 'package:together/View/AppThemeData.dart';
 import 'package:together/View/NoteCard.dart';
 import 'package:together/View/WidgetToLoad.dart';
 import 'package:together/ViewModel/NotesViewModel.dart';
@@ -15,8 +19,6 @@ class Notes extends StatefulWidget {
 
 class _NotesState extends State<Notes> {
   NotesViewModel _viewModel = NotesViewModel();
-
-  double _padding = 15.0;
 
   @override
   void initState() {
@@ -40,13 +42,16 @@ class _NotesState extends State<Notes> {
         builder: (context, snapshot) {
           _viewModel.loadData(snapshot);
 
-          return buildList();
+          return buildList(context);
         },
       ),
     );
   }
 
-  Widget buildList() {
+  Widget buildList(BuildContext context) {
+    final theme = context.watch<AppThemeData>();
+    final _padding = theme.padding;
+
     return WidgetToLoad(
         viewModel: _viewModel,
         child: ListView.builder(

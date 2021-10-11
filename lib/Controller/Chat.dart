@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:provider/provider.dart';
 
 import 'package:together/Core/UIFunctions.dart';
 import 'package:together/Core/Logger.dart';
+import 'package:together/View/AppThemeData.dart';
 import 'package:together/View/ChatTextField.dart';
 import 'package:together/ViewModel/ChatViewModel.dart';
 
@@ -20,9 +22,6 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   ChatViewModel _viewModel;
-
-  final double _padding = 15.0;
-  final double _appBarHeight = 55.0;
 
   final ScrollController _listController = new ScrollController();
 
@@ -41,9 +40,11 @@ class _ChatState extends State<Chat> {
     super.initState();
   }
 
-  // TODO: animated keyboard appearance
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<AppThemeData>();
+    final _padding = theme.padding;
+
     return Scaffold(
       appBar: PreferredSize(
           child: StreamBuilder(
@@ -52,7 +53,7 @@ class _ChatState extends State<Chat> {
               builder: (context, snapshot) {
                 return _appBarWidget(context, snapshot.data);
               }),
-          preferredSize: Size.fromHeight(_appBarHeight)),
+          preferredSize: Size.fromHeight(theme.chatTheme.appBarTheme.height)),
       body: Container(
         child: Column(
           children: <Widget>[
@@ -90,7 +91,7 @@ class _ChatState extends State<Chat> {
                   }
                 }),
             Divider(
-              height: 2,
+              height: 2
             ),
             _imageContainerWidget(context),
             ChatTextField(
@@ -103,6 +104,9 @@ class _ChatState extends State<Chat> {
   }
 
   Widget _imageContainerWidget(BuildContext context) {
+    final theme = context.watch<AppThemeData>();
+    final _padding = theme.padding;
+
     return StreamBuilder(
         stream: _viewModel.imagesStream,
         initialData: null,
@@ -143,6 +147,9 @@ class _ChatState extends State<Chat> {
   }
 
   Widget _chatWidget(BuildContext context) {
+    final theme = context.watch<AppThemeData>();
+    final _padding = theme.padding;
+
     return ListView.builder(
         padding: EdgeInsets.symmetric(vertical: _padding / 2),
         controller: _listController,
@@ -180,12 +187,10 @@ class _ChatState extends State<Chat> {
         title: Text(_viewModel.title),
       );
     } else {
-      Color actionsColor = Theme.of(context).primaryColor;
       List<Widget> actions = [
         IconButton(
           icon: Icon(
             Icons.content_copy,
-            color: actionsColor,
           ),
           onPressed: () {
             _viewModel.copyMessages();
@@ -195,14 +200,12 @@ class _ChatState extends State<Chat> {
         IconButton(
           icon: Icon(
             Icons.forward,
-            color: actionsColor,
           ),
           onPressed: null,
         ),
         IconButton(
             icon: Icon(
               Icons.delete,
-              color: actionsColor,
             ),
             onPressed: _viewModel.deleteMessages)
       ];
@@ -210,7 +213,6 @@ class _ChatState extends State<Chat> {
         leading: IconButton(
           icon: Icon(
             Icons.cancel,
-            color: actionsColor,
           ),
           onPressed: _viewModel.cancelEditing,
         ),
@@ -219,20 +221,3 @@ class _ChatState extends State<Chat> {
     }
   }
 }
-
-// class CustomScrollPhysics extends ScrollPhysics {
-//   const CustomScrollPhysics({this.parent});
-//
-//   final ScrollPhysics parent;
-//
-//   @override
-//   ScrollPhysics applyTo(ScrollPhysics ancestor) {
-//     return CustomScrollPhysics(parent: buildParent(ancestor));
-//   }
-//
-//   @override
-//   double get minFlingDistance => 5.0;
-//
-//   @override
-//   double get minFlingVelocity => 5.0;
-// }

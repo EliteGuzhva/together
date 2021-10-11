@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
 import 'package:together/Core/Misc.dart';
 import 'package:together/Model/Note.dart';
+import 'package:together/View/AppThemeData.dart';
 
 class NoteCard extends StatelessWidget {
   const NoteCard({Key key,
@@ -9,21 +13,17 @@ class NoteCard extends StatelessWidget {
 
   final Note note;
 
-  final double _padding = 15.0;
   final double _cardRadius = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    var widget = buildMaterialWidget();
+    final theme = context.watch<AppThemeData>();
+    final _padding = theme.padding;
 
-    return widget;
-  }
-
-  Widget buildMaterialWidget() {
     return Card(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(_cardRadius))),
-      color: Color(note.color),
+      color: theme.colorPalette.getColorByName(note.color),
       margin: EdgeInsets.only(
           left: _padding, right: _padding, top: _padding),
       child: Padding(
@@ -45,7 +45,6 @@ class NoteCard extends StatelessWidget {
                       note.text,
                       maxLines: 5,
                       style: TextStyle(
-                          color: Colors.black87,
                           fontWeight: FontWeight.w300),
                     ),
                   )

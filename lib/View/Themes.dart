@@ -1,50 +1,49 @@
-import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:together/View/AppThemeData.dart';
+import 'package:together/View/Themes/DefaultTheme.dart';
+import 'package:together/View/Themes/GruvboxMaterialDarkTheme.dart';
 
+class ThemeManager {
+  static final ThemeManager _singleton = ThemeManager._internal();
+  ThemeManager._internal();
 
-// Default
-const kDefaultThemeUnselectedButtonColor = Colors.blueGrey;
+  static ThemeManager get instance => _singleton;
 
-const kDefaultColorScheme = ColorScheme.light(
-    primary: Color(0xFF00538a),
-    primaryVariant: Color(0xFF216695),
-    secondary: Color(0xFF00538a),
-    secondaryVariant: Color(0xFF216695),
-    background: Color(0xFFF2F3F4),
-    surface: Colors.white
-);
+  var _themeStreamController = BehaviorSubject<AppThemeData>();
+  Stream<AppThemeData> get themeStream => _themeStreamController.stream;
+  set theme(String name) {
+    _themeStreamController.sink.add(fromString(name));
+    themeIdx = themes.indexOf(name);
+    if (themeIdx == -1)
+      themeIdx = 0;
+  }
 
-final kDefaultTheme = ThemeData(
-    iconTheme: IconThemeData(color: kDefaultColorScheme.primaryVariant),
-    colorScheme: kDefaultColorScheme,
-    appBarTheme: AppBarTheme(
-        color: kDefaultColorScheme.background,
-        titleTextStyle: TextStyle(
-            color: kDefaultColorScheme.primary,
-            fontFamily: "Qwigley",
-            fontSize: 40.0),
-        iconTheme: IconThemeData(color: kDefaultColorScheme.primaryVariant)),
-    buttonTheme: ButtonThemeData(
-        buttonColor: kDefaultColorScheme.primary,
-        textTheme: ButtonTextTheme.primary,
-        minWidth: 150.0,
-        height: 40,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0.0))),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-            primary: kDefaultColorScheme.primary,
-            minimumSize: Size(150.0, 40.0),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(0.0)),
-        )
-    ),
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: kDefaultColorScheme.background,
-        selectedItemColor: kDefaultColorScheme.primaryVariant,
-        unselectedItemColor: kDefaultThemeUnselectedButtonColor,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        type: BottomNavigationBarType.shifting
-    ),
-    scaffoldBackgroundColor: kDefaultColorScheme.background,
-);
+  List<String> _themes = [
+    "Default",
+    "GruvboxMaterialDark"
+  ];
+  List<String> get themes => _themes;
+
+  int themeIdx = 0;
+
+  String nextTheme() {
+    if (themeIdx < themes.length - 1) {
+      return themes[themeIdx + 1];
+    } else {
+      return themes[0];
+    }
+  }
+
+  AppThemeData fromString(String name) {
+    if (name == "Default")
+      return kDefaultAppTheme;
+    else if (name == "GruvboxMaterialDark")
+      return kGruvboxMaterialDarkAppTheme;
+    else
+      return kDefaultAppTheme;
+  }
+
+  void dispose() {
+    _themeStreamController.close();
+  }
+}

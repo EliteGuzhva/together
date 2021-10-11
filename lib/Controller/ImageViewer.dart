@@ -66,7 +66,7 @@ class _ImageViewerState extends State<ImageViewer> {
           child: AppBar(
             backgroundColor: Color(0x99000000),
             elevation: 0.0,
-            iconTheme: IconThemeData(color: Colors.white),
+            // iconTheme: IconThemeData(color: Colors.white),
             actions: <Widget>[
               PopupMenuButton<int>(
                   itemBuilder: (context) => _createMenuItems(context))

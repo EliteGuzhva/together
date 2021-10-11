@@ -8,7 +8,7 @@ class EditNoteViewModel {
   EditNoteViewModel({Key key, this.note}) {
     _titleStreamController.sink.add(note.title);
     _bodyStreamController.sink.add(note.text);
-    _colorStreamController.sink.add(Color(note.color));
+    _colorStreamController.sink.add(note.color);
   }
 
   Note note;
@@ -17,21 +17,21 @@ class EditNoteViewModel {
 
   var _titleStreamController = BehaviorSubject<String>();
   var _bodyStreamController = BehaviorSubject<String>();
-  var _colorStreamController = BehaviorSubject<Color>();
+  var _colorStreamController = BehaviorSubject<String>();
 
   Function(String) get titleChanged => _titleStreamController.sink.add;
   Function(String) get bodyChanged => _bodyStreamController.sink.add;
 
-  Stream<Color> get colorStream => _colorStreamController.stream;
+  Stream<String> get colorStream => _colorStreamController.stream;
 
-  Color get color => _colorStreamController.stream.value;
-  set color(Color c) => _colorStreamController.sink.add(c);
+  String get color => _colorStreamController.stream.value;
+  set color(String c) => _colorStreamController.sink.add(c);
 
   void _updateNote() {
     note = Note(
       _titleStreamController.stream.value,
       _bodyStreamController.stream.value,
-      _colorStreamController.stream.value.value,
+      _colorStreamController.stream.value,
       DateTime.now(),
       note.id
     );

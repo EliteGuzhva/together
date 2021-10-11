@@ -1,13 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:together/View/AppThemeData.dart';
 import 'package:together/ViewModel/ChatViewModel.dart';
 
+
 class ChatTextField extends StatelessWidget {
-  ChatTextField({
-    Key key,
-    @required this.viewModel,
-    @required this.onTap
-  }) : super(key: key);
+  ChatTextField({Key key, @required this.viewModel, @required this.onTap})
+      : super(key: key);
 
   final ChatViewModel viewModel;
   final Function onTap;
@@ -16,8 +18,13 @@ class ChatTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<AppThemeData>().chatTheme.textFieldTheme;
+
     return Container(
       child: TextField(
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.onBackground
+        ),
         focusNode: focusNode,
         controller: viewModel.textController,
         onChanged: viewModel.textChanged,
@@ -27,23 +34,21 @@ class ChatTextField extends StatelessWidget {
         maxLines: 5,
         minLines: 1,
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(vertical: 20.0),
+            fillColor: Theme.of(context).colorScheme.background,
+            filled: true,
+            contentPadding: EdgeInsets.symmetric(vertical: 20.0),
             border: InputBorder.none,
-            prefixIcon: IconButton(
-                icon: Icon(Icons.attach_file),
-                onPressed: _onPick),
-            hintText: "Напиши мне что-нибудь",
+            prefixIcon:
+                IconButton(icon: Icon(theme.attachIcon), onPressed: _onPick),
+            hintText: theme.hintText,
             suffixIcon: StreamBuilder(
                 stream: viewModel.canSend,
                 initialData: false,
                 builder: (context, snapshot) {
                   return IconButton(
-                      icon: Icon(Icons.send),
-                      onPressed:
-                      snapshot.data ? viewModel.sendMessage : null
-                  );
-                }
-            ),
+                      icon: Icon(theme.sendIcon),
+                      onPressed: snapshot.data ? viewModel.sendMessage : null);
+                }),
             suffix: StreamBuilder(
                 stream: viewModel.isSending,
                 initialData: false,
@@ -52,7 +57,7 @@ class ChatTextField extends StatelessWidget {
                     return Container(
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(
-                            Theme.of(context).primaryColor),
+                            Theme.of(context).colorScheme.primaryVariant),
                       ),
                       width: 10,
                       height: 10,
@@ -68,8 +73,7 @@ class ChatTextField extends StatelessWidget {
     );
   }
 
-  void _onPick()
-  {
+  void _onPick() {
     focusNode.unfocus();
     focusNode.canRequestFocus = false;
 
@@ -92,3 +96,4 @@ class ChatTextField extends StatelessWidget {
 //    });
 //  }
 }
+

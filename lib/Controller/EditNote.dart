@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
 import 'package:together/Core/UIFunctions.dart';
 import 'package:together/Model/Note.dart';
+import 'package:together/View/AppThemeData.dart';
 import 'package:together/ViewModel/EditNoteViewModel.dart';
 
 class EditNote extends StatefulWidget {
@@ -15,18 +19,6 @@ class EditNote extends StatefulWidget {
 class _EditNoteState extends State<EditNote> {
   EditNoteViewModel _viewModel;
 
-  double _padding = 15.0;
-
-  List<Color> _availableColors = [
-    Color(0xFFFF7777),
-    Color(0xFFCCEEFF),
-    Color(0xFFCCFFEE),
-    Color(0xFFFFFF88),
-    Color(0xFFAAAAAA)
-  ];
-
-  List<Widget> _colorSelection = [];
-
   TextEditingController _titleController = TextEditingController();
   TextEditingController _bodyController = TextEditingController();
 
@@ -37,33 +29,47 @@ class _EditNoteState extends State<EditNote> {
     _viewModel = EditNoteViewModel(note: widget.note);
     _titleController.text = widget.note.title;
     _bodyController.text = widget.note.text;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppThemeData>();
+    final _padding = theme.padding;
+
+    List<String> _availableColors = [
+      "Red",
+      "Green",
+      "Yellow",
+      "Cyan",
+      "Black"
+    ];
+
+    List<Widget> _colorSelection = [];
 
     for (int i = 0; i < _availableColors.length; i++) {
+      Color color = theme.colorPalette.getColorByName(_availableColors[i]);
       Widget button = FloatingActionButton(
         mini: true,
         heroTag: i,
-        backgroundColor: _availableColors[i],
+        backgroundColor: color,
         onPressed: () {
           _viewModel.color = _availableColors[i];
         },
       );
       _colorSelection.add(button);
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _viewModel.onWillPop,
       child: StreamBuilder(
           stream: _viewModel.colorStream,
-          initialData: Color(_viewModel.note.color),
+          initialData: _viewModel.color,
           builder: (context, snapshot) {
-            Color currentColor = snapshot.data;
+            Color currentColor = theme.colorPalette.getColorByName(snapshot.data);
 
             return Scaffold(
                 appBar: PreferredSize(
-                    preferredSize: Size.fromHeight(50),
+                    preferredSize: Size.fromHeight(55),
                     child: Builder(builder: (context) {
                       return AppBar(
                         backgroundColor:
@@ -72,7 +78,7 @@ class _EditNoteState extends State<EditNote> {
                           controller: _titleController,
                           onChanged: _viewModel.titleChanged,
                           textCapitalization: TextCapitalization.words,
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          style: TextStyle(color: theme.colorPalette.foreground, fontSize: 20),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                           ),

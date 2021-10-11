@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+
 import 'package:link_text/link_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 
 import 'package:together/Model/Message.dart';
 import 'package:together/Controller/ImageViewer.dart';
 import 'package:together/Core/UIFunctions.dart';
+import 'package:together/View/AppThemeData.dart';
 
 class Bubble extends StatelessWidget {
   Bubble(
@@ -21,18 +24,19 @@ class Bubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color myColor = Theme.of(context).colorScheme.secondaryVariant;
-    final Color otherColor = Theme.of(context).colorScheme.surface;
+    final appTheme = context.watch<AppThemeData>();
+    final theme = appTheme.chatTheme.bubbleTheme;
 
     final String messageText = message.text;
-    Color bg = selected ? Colors.blueGrey : isMe ? myColor : otherColor;
-    final textColor = isMe ? Colors.white : Colors.black;
-    final timeColor = isMe ? Colors.white70 : Colors.black38;
-    final align = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+
+    final Color bg = selected ? theme.selectedBgColor : isMe ? theme.myBgColor : theme.otherBgColor;
+    final textColor = isMe ? theme.myFgColor : theme.otherFgColor;
+    final timeColor = isMe ? theme.myTimeColor : theme.otherTimeColor;
+    final align = isMe ? theme.myAlignment : theme.otherAlignment;
     final icon = message.isLoading
-        ? Icons.access_time
-        : message.delivered ? Icons.done_all : Icons.done;
-    final radiusSize = 20.0;
+        ? theme.loadingIcon
+        : message.delivered ? theme.deliveredIcon : theme.sentIcon;
+    final radiusSize = theme.radius;
     final radius = isMe
         ? BorderRadius.only(
             topRight: Radius.circular(radiusSize),
@@ -128,15 +132,12 @@ class Bubble extends StatelessWidget {
                     vertical: 5.0, horizontal: _screenWidth * 0.3),
                 padding: EdgeInsets.all(3.0),
                 decoration: BoxDecoration(
-                    color: Colors.white70,
+                    color: Theme.of(context).colorScheme.background,
                     borderRadius:
                         BorderRadius.all(Radius.circular(radiusSize / 2))),
                 child: Text(
                   date,
-                  style: TextStyle(
-                      color: Color(0xFF00538a),
-                      fontSize: 22.0,
-                      fontFamily: "Qwigley"),
+                  style: theme.newDayTextStyle,
                 ))
             : Container(),
         Container(
@@ -165,7 +166,7 @@ class Bubble extends StatelessWidget {
                     Text(time,
                         style: TextStyle(
                           color: message.type == "photo"
-                              ? Colors.white
+                              ? appTheme.colorPalette.whiteBright
                               : timeColor,
                           fontSize: 10.0,
                         )),
@@ -173,7 +174,7 @@ class Bubble extends StatelessWidget {
                     Icon(
                       icon,
                       size: 14.0,
-                      color: message.delivered ? Colors.green : Colors.black38,
+                      color: message.delivered ? appTheme.colorPalette.greenBright : appTheme.colorPalette.black,
                     )
                   ],
                 ),

@@ -1,7 +1,7 @@
 class Note {
   final String title;
   final String text;
-  final int color;
+  final String color;
   final DateTime timestamp;
   final String id;
 
@@ -13,7 +13,7 @@ class Note {
   }
 
   factory Note.createNew() {
-    return new Note("Новая заметка", "", 0xFFCCEEFF, DateTime.now(), "");
+    return new Note("Новая заметка", "", "Cyan", DateTime.now(), "");
   }
 
   Map<String, dynamic> toMap() {
