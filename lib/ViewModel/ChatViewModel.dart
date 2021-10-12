@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:together/Core/Connectivity.dart';
 import 'package:together/Core/FileIO.dart';
@@ -14,14 +15,22 @@ import 'package:together/Core/SnapshotLoader.dart';
 import 'package:together/Model/Message.dart';
 import 'package:together/Server/Server.dart';
 import 'package:together/View/Bubble.dart';
+import 'package:together/View/Themes.dart';
 
+
+class ConfigurationResult {
+  final bool isConfiguring;
+  final ImageProvider<Object> chatBackground;
+
+  ConfigurationResult(this.isConfiguring, this.chatBackground);
+}
 
 class ChatViewModel extends SnapshotLoader {
   final fio = FileIO();
+  final ImagePicker _picker = ImagePicker();
 
   List<Message> _messages = [];
   String _sender;
-  String background = "res/bg1.jpg";
 
   String title = "Together";
 
@@ -46,8 +55,8 @@ class ChatViewModel extends SnapshotLoader {
   Function(String) get textChanged => _textStreamController.sink.add;
   bool get textIsEmpty => _textStreamController.stream.value == "";
 
-  var _imagesStreamController = BehaviorSubject<List<Asset>>();
-  Stream<List<Asset>> get imagesStream => _imagesStreamController.stream;
+  var _imagesStreamController = BehaviorSubject<List<XFile>>();
+  Stream<List<XFile>> get imagesStream => _imagesStreamController.stream;
   bool get imagesIsEmpty => _imagesStreamController.stream.value == null;
 
   var _selectedMessagesStreamController = BehaviorSubject<List<int>>();
@@ -64,6 +73,13 @@ class ChatViewModel extends SnapshotLoader {
     return Rx.combineLatest3(_textStreamController.stream,
         _imagesStreamController.stream, _isSendingStreamController, (t, i, s) {
       return (t != "" || i != null) && s == false;
+    });
+  }
+
+  Stream<ConfigurationResult> get configurationStream {
+    return Rx.combineLatest2(_isConfiguringStreamController.stream,
+        ThemeManager.instance.chatBackgroundStream, (b, c) {
+      return ConfigurationResult(b, c);
     });
   }
 
@@ -121,15 +137,7 @@ class ChatViewModel extends SnapshotLoader {
   }
 
   Future _init() async {
-    await setBackground();
     await _getSender();
-  }
-
-  Future setBackground() async {
-    String bg = await fio.readAsString(fio.BACKGROUND);
-    if (bg != null && bg != "") {
-      background = bg;
-    }
   }
 
   Future _getSender() async {
@@ -137,18 +145,17 @@ class ChatViewModel extends SnapshotLoader {
   }
 
   void pickImages() async {
-    List<Asset> result;
+    List<XFile> result;
     try {
-      result =
-          await MultiImagePicker.pickImages(maxImages: 10, enableCamera: true);
-    } on Exception catch (e) {
+      result = await _picker.pickMultiImage();
+    } catch (e) {
       logError(this.toString(), e.toString());
     }
 
     _imagesStreamController.sink.add(result);
   }
 
-  void removeImage(Asset image) {
+  void removeImage(XFile image) {
     var images = _imagesStreamController.stream.value;
 
     images.remove(image);
@@ -184,21 +191,28 @@ class ChatViewModel extends SnapshotLoader {
       _isSendingStreamController.sink.add(true);
 
       for (int i = 0; i < images.length; i++) {
-        String id = Server.instance.database.createDocumentIdAt("chat");
-        ByteData data = await images[i].getByteData(quality: 80);
-        List<String> imgInfo =
-            await Server.instance.storage.uploadPhoto("chat", id, data);
+        try {
+            Uint8List data = await images[i].readAsBytes();
+            ByteData dataView = ByteData.view(data.buffer);
 
-        Message message = Message("[Photo]", _sender, DateTime.now(),
-            [imgInfo[1]], false, id, "photo");
+            String id = Server.instance.database.createDocumentIdAt("chat");
 
-        Server.instance.database
-            .sendMessage(message, _sender, receiver)
-            .whenComplete(() {
-          if (i == images.length - 1) {
-            // _reset();
-          }
-        });
+            List<String> imgInfo =
+                await Server.instance.storage.uploadPhoto("chat", id, dataView);
+
+            Message message = Message("[Photo]", _sender, DateTime.now(),
+                [imgInfo[1]], false, id, "photo");
+
+            Server.instance.database
+                .sendMessage(message, _sender, receiver)
+                .whenComplete(() {
+              if (i == images.length - 1) {
+                // _reset();
+              }
+            });
+        } catch (e) {
+            logError(this.toString(), e.toString());
+        }
       }
     }
 

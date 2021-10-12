@@ -80,7 +80,6 @@ class _MainNavigationState extends State<MainNavigation> {
 
   void _onItemTapped(int index) async {
     if (index == _chatIndex) {
-      await _chatViewModel.setBackground();    
       Widget page = await Future.microtask(() {
         return Chat(viewModel: _chatViewModel);
       });

@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 
+import 'package:together/Core/FileIO.dart';
 import 'package:together/Core/UIFunctions.dart';
 import 'package:together/Core/Logger.dart';
 import 'package:together/View/AppThemeData.dart';
@@ -58,17 +61,19 @@ class _ChatState extends State<Chat> {
         child: Column(
           children: <Widget>[
             StreamBuilder(
-                stream: _viewModel.isConfiguring,
-                initialData: true,
+                stream: _viewModel.configurationStream,
+                initialData: ConfigurationResult(true, null),
                 builder: (context, snapshot) {
-                  if (snapshot.data == true) {
+                  ConfigurationResult res = snapshot.data;
+
+                  if (res.isConfiguring == true || res.chatBackground == null) {
                     return Center(child: CircularProgressIndicator());
                   } else {
                     return Expanded(
                         child: Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage(_viewModel.background),
+                          image: res.chatBackground,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -110,7 +115,7 @@ class _ChatState extends State<Chat> {
     return StreamBuilder(
         stream: _viewModel.imagesStream,
         initialData: null,
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<XFile>> snapshot) {
           if (snapshot.data != null && snapshot.data != []) {
             var images = snapshot.data;
 
@@ -124,11 +129,8 @@ class _ChatState extends State<Chat> {
                       padding: EdgeInsets.only(right: _padding / 2),
                       child: Stack(
                         children: <Widget>[
-                          AssetThumb(
-                            asset: img,
-                            width: 100,
-                            height: 100,
-                          ),
+                          Image.file(File(img.path),
+                              width: 100, height: 100, fit: BoxFit.fill),
                           Positioned(
                               top: -10.0,
                               right: -10.0,

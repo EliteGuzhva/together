@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:together/Core/Logger.dart';
 import 'package:together/Server/Server.dart';
@@ -41,6 +44,10 @@ class _SettingsState extends State<Settings> {
                 }
               ),
               ElevatedButton(
+                child: Text("Выбрать фон"),
+                onPressed: () => _chooseChatBackground(context)
+              ),
+              ElevatedButton(
                 child: Text("Выйти"),
                 onPressed: () {
                   _server.auth.signOut().whenComplete(() {
@@ -55,5 +62,17 @@ class _SettingsState extends State<Settings> {
             ],
           ),
         ));
+  }
+
+  void _chooseChatBackground(BuildContext context) async {
+    final ImagePicker picker = ImagePicker();
+    final FileIO fio = FileIO();
+
+    XFile result = await picker.pickImage(source: ImageSource.gallery);
+    File localImg = await fio.persistXFile(result);
+
+    ThemeManager.instance.setChatBackground(localImg.path, () {
+      showSnack(context, "Фон обновился");
+    });
   }
 }

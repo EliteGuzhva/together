@@ -1,29 +1,95 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
-import 'package:together/Model/Album.dart';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-class FileIO {
-  String ALBUMS = "albums.json";
-  String DEFAULT_ALBUMS = "res/default_albums.json";
-  String BACKGROUND = "background.txt";
+import 'package:image_downloader/image_downloader.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:together/Core/Logger.dart';
+import 'package:together/Model/Album.dart';
+
+
+class FileIO {
+  static const String kAlbums = "albums.json";
+  static const String kDefaultAlbums = "res/default_albums.json";
+  static const String kBackground = "background.txt";
+
+  static const String kChatBackgroundKey = "chat_background";
+
+  // Utils
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
-
     return directory.path;
   }
 
-  Future<File> _localFile (String filename) async {
+  Future<String> localFilePath(String filename) async {
     final path = await _localPath;
-    return File('$path/$filename');
+    return '$path/$filename';
   }
 
+  Future<File> _localFile(String filename) async {
+    final path = await localFilePath(filename);
+    return File(path);
+  }
+
+  // Persistent File storage
+  Future<File> persistFile(File tmpFile) async {
+    final filename = basename(tmpFile.path);
+    final persistentPath = await localFilePath(filename);
+
+    return tmpFile.copy(persistentPath);
+  }
+
+  Future<File> persistXFile(XFile tmpFile) async {
+    final filename = basename(tmpFile.path);
+    final persistentPath = await localFilePath(filename);
+    await tmpFile.saveTo(persistentPath);
+
+    return File(persistentPath);
+  }
+
+  // Shared preferences
+  Future<String> retrieveString(String key) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      String value;
+      try {
+        value = prefs.getString(key);
+      } catch (e) {
+        logError(this.toString(), e.toString());
+      }
+
+      return value;
+  }
+
+  Future<bool> storeString(String key, String value) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      return prefs.setString(key, value);
+  }
+
+  static ImageProvider<Object> getImage(String path) {
+    if (path.contains("res/")) {
+      return AssetImage(path);
+    } else {
+      return FileImage(File(path));
+    }
+  }
+
+  // Download
+  Future<String> downloadImage(String url) async {
+      String imageId = await ImageDownloader.downloadImage(url);
+      return await ImageDownloader.findPath(imageId);
+  }
+
+  // I/O
   Future<File> write(String filename, String contents) async {
     final file = await _localFile(filename);
-
     return file.writeAsString(contents);
   }
 
@@ -75,11 +141,11 @@ class FileIO {
   }
 
   Future<String> _loadAlbumsAsset() async {
-    return await readAsString(ALBUMS);
+    return await readAsString(kAlbums);
   }
 
   Future<String> _loadDefaultAlbumsAsset() async {
-    return await rootBundle.loadString(DEFAULT_ALBUMS);
+    return await rootBundle.loadString(kDefaultAlbums);
   }
 
   Future<List<Album>> loadAlbums() async {
@@ -87,24 +153,24 @@ class FileIO {
     var jsonResponse = json.decode(jsonString);
     var tmp = jsonResponse["albums"] as List;
     List<Album> defaultAlbums = tmp.map((album) => Album.fromJson(album)).toList();
-    var all_albums = defaultAlbums;
+    var allAlbums = defaultAlbums;
 
     jsonString = await _loadAlbumsAsset();
     if (jsonString != "") {
       jsonResponse = json.decode(jsonString);
       tmp = jsonResponse["albums"] as List;
       List<Album> albums = tmp.map((album) => Album.fromJson(album)).toList();
-      all_albums += albums;
+      allAlbums += albums;
     }
 
-    return all_albums;
+    return allAlbums;
   }
 
   Future updateAlbums(List<Album> albums) async {
     List<Map<String, dynamic>> converted = albums.map((album) => album.toJson()).toList();
     Map<String, dynamic> data = {"albums": converted};
     final encodedString = json.encode(data);
-    write(ALBUMS, encodedString);
+    write(kAlbums, encodedString);
   }
 
 }

@@ -1,17 +1,35 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:together/Controller/Login.dart';
 import 'package:together/Core/Connectivity.dart';
+import 'package:together/Core/FileIO.dart';
 import 'package:together/Server/Server.dart';
 import 'package:together/View/AppTheme.dart';
 import 'package:together/View/AppThemeData.dart';
 import 'package:together/View/Themes.dart';
 
 
+Future initChatBackground() async {
+  final fio = FileIO();
+  String bg = await fio.retrieveString(FileIO.kChatBackgroundKey);
+  bool bgExists = bg != null && await File(bg).exists();
+
+  if (bg == null || bg == "" || (!bg.contains("res/") && !bgExists)) {
+    bg = "res/bg1.jpg";
+    await fio.storeString(FileIO.kChatBackgroundKey, bg);
+  }
+
+  ThemeManager.instance.chatBackground = bg;
+}
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ConnectionStatusSingleton.getInstance().initialize();
   await Server.instance.initializeBackend(Backend.FIREBASE);
+  await initChatBackground();
 
   runApp(MyApp());
 }

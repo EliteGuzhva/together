@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:image_downloader/image_downloader.dart';
 import 'package:photo_view/photo_view.dart';
 
 import 'package:together/Core/UIFunctions.dart';
 import 'package:together/Core/FileIO.dart';
+import 'package:together/View/Themes.dart';
 
 class ImageViewer extends StatefulWidget {
   ImageViewer(
@@ -25,10 +25,13 @@ class ImageViewer extends StatefulWidget {
 class _ImageViewerState extends State<ImageViewer> {
   final fio = FileIO();
   bool _isDownloading = false;
+  String _imagePath;
 
   @override
   void initState() {
     super.initState();
+
+    _imagePath = widget.fromInternet ? "" : widget.imageName;
   }
 
   @override
@@ -77,44 +80,26 @@ class _ImageViewerState extends State<ImageViewer> {
     );
   }
 
-  // TODO: download manually, read from memory and use ImageProvider
-  void _downloadImage(BuildContext context) async {
+  Future<void> _downloadImage(BuildContext context) async {
     showSnack(context, "Скачивается...");
     setState(() {
       _isDownloading = true;
     });
 
-    await ImageDownloader.downloadImage(widget.imageName)
-        .whenComplete(() {
+    _imagePath = await fio.downloadImage(widget.imageName).whenComplete(() {
       showSnack(context, "Фотография загрузилась");
       setState(() {
         _isDownloading = false;
       });
     });
-
-    // Download method for caching chat images
-//    var documentDirectory = await getExternalStorageDirectory();
-//    var firstPath = documentDirectory.path + "/chat_images";
-//    var filePathAndName = documentDirectory.path +
-//        '/chat_images/${widget.imageName.split("?")[0].split("/").last}';
-//    await Directory(firstPath).create(recursive: true);
-//    File file2 = new File(filePathAndName);
-//
-//    var response = await get(widget.imageName);
-//    file2.writeAsBytesSync(response.bodyBytes);
-
-//    setState(() {
-//      showSnack(context, "Фотография загрузилась");
-//      _isDownloading = false;
-//    });
   }
 
   void _setAsBackground(BuildContext context) async {
-    if (widget.fromInternet) {
-      showSnack(context, "Фотография не скачана");
-      return;
+    if (_imagePath == null || _imagePath == "") {
+      await _downloadImage(context);
     }
-    await fio.write(fio.BACKGROUND, widget.imageName).whenComplete(() {
+
+    ThemeManager.instance.setChatBackground(_imagePath, () {
       showSnack(context, "Фон обновился");
     });
   }
