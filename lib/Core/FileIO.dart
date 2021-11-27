@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -24,7 +25,10 @@ class FileIO {
 
   // Utils
   Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
+    Directory directory;
+    if (!kIsWeb)
+      directory = await getApplicationDocumentsDirectory();
+
     return directory.path;
   }
 
@@ -83,8 +87,10 @@ class FileIO {
 
   // Download
   Future<String> downloadImage(String url) async {
-      String imageId = await ImageDownloader.downloadImage(url);
-      return await ImageDownloader.findPath(imageId);
+    if (kIsWeb)
+      return "";
+    String imageId = await ImageDownloader.downloadImage(url);
+    return await ImageDownloader.findPath(imageId);
   }
 
   // I/O

@@ -87,7 +87,11 @@ class _ImageViewerState extends State<ImageViewer> {
     });
 
     _imagePath = await fio.downloadImage(widget.imageName).whenComplete(() {
-      showSnack(context, "Фотография загрузилась");
+      var message = "Фотография загрузилась";
+      if (_imagePath == "")
+        message = "Произошла ошибка при загрузке";
+
+      showSnack(context, message);
       setState(() {
         _isDownloading = false;
       });

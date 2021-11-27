@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:together/Controller/Login.dart';
@@ -14,7 +15,9 @@ import 'package:together/View/Themes.dart';
 Future initChatBackground() async {
   final fio = FileIO();
   String bg = await fio.retrieveString(FileIO.kChatBackgroundKey);
-  bool bgExists = bg != null && await File(bg).exists();
+  bool bgExists = bg != null;
+  if (!kIsWeb)
+    bgExists = bgExists && await File(bg).exists();
 
   if (bg == null || bg == "" || (!bg.contains("res/") && !bgExists)) {
     bg = "res/bg1.jpg";

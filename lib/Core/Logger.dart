@@ -25,7 +25,8 @@ class Logger
     String text = logLevel.toString()
         + " [" + date + " - " + time + "] - "
         + owner + ": " + logText + "\n";
-    _fio.append(logName + ".txt", text);
+    if (!Foundation.kIsWeb)
+      _fio.append(logName + ".txt", text);
 
     return text;
   }

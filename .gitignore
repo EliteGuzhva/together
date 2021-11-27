@@ -32,6 +32,9 @@
 .pub/
 /build/
 
+# Web related
+**/web/**/firebase_config.js
+
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
